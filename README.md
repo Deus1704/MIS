@@ -16,7 +16,7 @@ Required for high-fidelity 512x512 testing in Path A.
    ```bash
    python Path_A_LPD/download_aapm.py
    ```
-3. Use the NBIA Data Retriever or REST API to pull the `L001`-`L010` volumetric slices and place the numpy arrays within `real_data/aapm_ldct/`.
+3. Use the NBIA Data Retriever or REST API to pull ONLY the `L001`, `L002`, `L003` (Train) and `L010` (Eval) volumetric slices to keep the size under 50GB and place the numpy arrays within `real_data/aapm_ldct/`.
 
 ### 2. OrganAMNIST (Real CT slices)
 Required for the fast training loops and Path B's FreqHybridNet pipeline.
