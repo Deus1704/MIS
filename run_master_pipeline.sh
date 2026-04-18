@@ -39,7 +39,9 @@ if [[ "$1" == "--download-only" ]]; then
     echo -e "\n\e[1;32m>>> RUNNING TCIA DUMMY/LITE INJECTION PIPELINE (Path A)...\e[0m"
     python Path_A_LPD/download_aapm.py
     
-    echo -e "\n\e[1;32m>>> DOWNLOADING ORGANAMNIST (Path B)...\e[0m"
+    echo -e "\n\e[1;32m>>> CONVERTING CLINICAL DICOMS TO FAST NUMPY (.npy)...\e[0m"
+    draw_progress_bar 1.5 "Converting Phantom Hounsfield Units via Pydicom..."
+    python Path_A_LPD/convert_dcm_to_npy.py
     mkdir -p Path_B_FreqHybridNet/real_data/organamnist/raw
     if [ ! -f "Path_B_FreqHybridNet/real_data/organamnist/raw/organamnist.npz" ]; then
         # Utilizing general mock download/placeholder for the public dataset
