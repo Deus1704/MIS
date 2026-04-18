@@ -27,7 +27,7 @@ def train_aapm():
         print(f"WARNING: AAPM Data path {root_dir} not found. Did you run download_aapm.py?")
         return
 
-    # DataLoader strictly pointing to 9 Patients (L001-L009 Training Split)
+    # DataLoader pointing to the Phantom_Train Split (~15,000 arrays)
     train_dataset = AAPMDataset(root_dir=root_dir, split="train", n_angles=num_angles, image_size=image_size, cache_to_ram=True)
     
     if len(train_dataset) == 0:
@@ -53,8 +53,8 @@ def train_aapm():
     criterion = nn.MSELoss()
     
     print("\nStarting Grand Challenge Training Loop on 512x512 slices...")
-    # Typically 2168 slices require ~50 epochs for stable convergence.
-    num_epochs = 50 
+    # The 1.8GB Phantom pushes ~15,000 training slices, so only ~10 epochs are needed vs the original 50 used for 2000 slices.
+    num_epochs = 10 
     
     for epoch in range(num_epochs):
         model.train()

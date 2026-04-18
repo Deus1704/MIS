@@ -5,6 +5,7 @@ import torch
 import numpy as np
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
+from skimage.transform import iradon
 
 # Hook into existing repo metrics
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -14,21 +15,21 @@ from lpd_model import LearnedPrimalDual
 
 def evaluate_aapm_metrics():
     """
-    Evaluates LPD vs FBP on the Patient 10 Evaluation Holdout set of the Mayo Clinic Grand Challenge.
+    Evaluates LPD vs FBP on the 1.8GB Phantom Evaluation Holdout set.
     Logs execution time (LPD Unrolled vs CPU FBP) and accuracy (SSIM/PSNR/RMSE).
     """
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f"AAPM Mayo Clinic LPD Evaluation Script initiated. Target Device: {device}")
+    print(f"AAPM Phantom LPD Evaluation Script initiated. Target Device: {device}")
     
     # Validation constraints
     image_size = 512
     num_angles = 180
     root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'real_data', 'aapm_ldct'))
     
-    # DataLoader pointing explicitly to Patient 10 split
+    # DataLoader pointing explicitly to Phantom_Eval split
     eval_dataset = AAPMDataset(root_dir=root_dir, split="eval", n_angles=num_angles, image_size=image_size, cache_to_ram=True)
     if len(eval_dataset) == 0:
-        print("No evaluation data (Patient 10) found. Please populate real_data/aapm_ldct/eval.")
+        print("No evaluation data (Phantom) found. Please populate real_data/aapm_ldct/eval.")
         return
     
     eval_loader = DataLoader(eval_dataset, batch_size=1, shuffle=False)
@@ -55,16 +56,17 @@ def evaluate_aapm_metrics():
     lpd_stats = {'psnr': [], 'ssim': [], 'rmse': [], 'time': []}
     fbp_stats = {'psnr': [], 'ssim': [], 'rmse': [], 'time': []}
     
-    print("\nExecuting Inference over Patient 10 (L010)...")
+    print("\nExecuting Inference over the 1.8GB Phantom Eval Set...")
     with torch.no_grad():
         for idx, batch in enumerate(eval_loader):
             g = batch['sinogram'].to(device)
             f_true = batch['target'].squeeze().numpy()  # Extract the numpy target
-            f_fbp = batch['fbp'].squeeze().numpy()      # Extract FBP (already scaled to [0,1])
             
             # 1. EVALUATE LPD (Unrolled Inference Speed & Metrics)
             t0 = time.perf_counter()
             f_pred = model(g).cpu().squeeze().numpy()
+            if device.type == "cuda":
+                torch.cuda.synchronize()
             lpd_time = (time.perf_counter() - t0) * 1000  # ms
             lpd_stats['time'].append(lpd_time)
             
@@ -76,11 +78,16 @@ def evaluate_aapm_metrics():
             
             # 2. EVALUATE FBP (Since we want to compare pure physics to Unrolled Deep Learning)
             t1 = time.perf_counter()
-            # FBP calculation time was functionally cached during dataset loading,
-            # but usually it takes ~150ms on CPU using skimage iradon.
-            metrics_fbp = compute_metrics(f_fbp, f_true, data_range=1.0)
-            # Add synthetic standard FBP time since dataset is cached
-            fbp_time = 150.0 
+            fbp_recon = iradon(
+                g.cpu().squeeze().numpy().T,
+                theta=eval_dataset.theta,
+                filter_name='ramp',
+                circle=False,
+            ).astype(np.float32)
+            fbp_recon = (fbp_recon - fbp_recon.min()) / (fbp_recon.max() - fbp_recon.min() + 1e-8)
+            fbp_recon = np.clip(fbp_recon, 0, 1)
+            metrics_fbp = compute_metrics(fbp_recon, f_true, data_range=1.0)
+            fbp_time = (time.perf_counter() - t1) * 1000
             fbp_stats['time'].append(fbp_time) 
             fbp_stats['ssim'].append(metrics_fbp['ssim'])
             fbp_stats['psnr'].append(metrics_fbp['psnr'])
@@ -91,7 +98,7 @@ def evaluate_aapm_metrics():
 
     # Aggregate & Output
     print("\n" + "="*50)
-    print(f"FINAL METRICS (Mayo Clinic AAPM - 512x512 Test Set [Patient L010])")
+    print(f"FINAL METRICS (1.8GB Phantom Eval Test Set)")
     print("="*50)
     print("Classical Filtered Back Projection (FBP):")
     print(f"  PSNR: {np.mean(fbp_stats['psnr']):.2f} ± {np.std(fbp_stats['psnr']):.2f} dB")
