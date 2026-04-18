@@ -1,0 +1,23 @@
+# Datasets and Data Files
+real_data/
+*/real_data/
+*.npy
+*.npz
+*.pkz
+data/
+tmp_demo/
+
+# Checkpoints and Model Weights
+checkpoints/
+*.pt
+*.pth
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env/
+
+# OS Files
+.DS_Store
