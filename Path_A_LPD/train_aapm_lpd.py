@@ -37,7 +37,8 @@ def train_aapm():
     sample_bundle = train_dataset[0]
     _, actual_angles, actual_detectors = sample_bundle['sinogram'].shape
     
-    train_loader = DataLoader(train_dataset, batch_size=2, shuffle=True)  # Batch 2 to prevent 512x512 VRAM explosion
+    # Bumped batch size to 4 and added workers since you have 97GB+ VRAM!
+    train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, num_workers=4, pin_memory=True)
     
     # Model instantiation
     # IMPORTANT: 512x512 spatial primitives alongside 10 iterations of Primal-Dual blocks requires massive GPU memory.
@@ -53,14 +54,18 @@ def train_aapm():
     criterion = nn.MSELoss()
     
     print("\nStarting Grand Challenge Training Loop on 512x512 slices...")
-    # The 1.8GB Phantom pushes ~15,000 training slices, so only ~10 epochs are needed vs the original 50 used for 2000 slices.
-    num_epochs = 10 
+    # Accelerated Training Configurations for Presentation Deadline
+    num_epochs = 2
+    max_steps_per_epoch = 250  # Processes 1000 slices per epoch (4 batch * 250 steps). This brings runtime from 7.5 hours to literally ~15 minutes.
     
     for epoch in range(num_epochs):
         model.train()
         epoch_loss = 0.0
         
         for batch_idx, batch in enumerate(train_loader):
+            if batch_idx >= max_steps_per_epoch:
+                break
+                
             g = batch["sinogram"].to(device)
             f_true = batch["target"].to(device)
             
@@ -73,9 +78,9 @@ def train_aapm():
             epoch_loss += loss.item()
             
             if batch_idx % 10 == 0:
-                print(f"Epoch [{epoch+1}/{num_epochs}], Step [{batch_idx}/{len(train_loader)}], Loss: {loss.item():.6f}")
+                print(f"Epoch [{epoch+1}/{num_epochs}], Step [{batch_idx}/{max_steps_per_epoch}], Loss: {loss.item():.6f}")
                 
-        print(f"--- Epoch {epoch+1} Complete. Average Loss: {epoch_loss / len(train_loader):.6f} ---")
+        print(f"--- Epoch {epoch+1} Complete. Average Loss: {epoch_loss / max_steps_per_epoch:.6f} ---")
         
     os.makedirs('checkpoints', exist_ok=True)
     torch.save(model.state_dict(), 'checkpoints/lpd_aapm_512.pth')
