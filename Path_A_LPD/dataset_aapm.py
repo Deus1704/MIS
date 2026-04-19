@@ -57,6 +57,11 @@ class AAPMDataset(Dataset):
         file_path = self.files[idx]
         image = np.load(file_path).astype(np.float32)
         
+        # Ensure image is exactly [self.image_size x self.image_size]
+        if image.shape != (self.image_size, self.image_size):
+            from skimage.transform import resize
+            image = resize(image, (self.image_size, self.image_size), anti_aliasing=True).astype(np.float32)
+            
         # Normalize strictly to [0,1] mapping HU units typically provided by AAPM
         image = (image - image.min()) / (image.max() - image.min() + 1e-8)
         
