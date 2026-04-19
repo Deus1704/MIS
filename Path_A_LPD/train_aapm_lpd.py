@@ -28,7 +28,7 @@ def train_aapm():
         return
 
     # DataLoader pointing to the Phantom_Train Split (~15,000 arrays)
-    train_dataset = AAPMDataset(root_dir=root_dir, split="train", n_angles=num_angles, image_size=image_size, cache_to_ram=True)
+    train_dataset = AAPMDataset(root_dir=root_dir, split="train", n_angles=num_angles, image_size=image_size, cache_to_ram=False)
     
     if len(train_dataset) == 0:
          print("No data. Exiting compilation. Please inject the AAPM NumPy arrays into real_data/aapm_ldct/train.")

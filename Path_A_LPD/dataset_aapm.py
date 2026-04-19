@@ -51,7 +51,7 @@ class AAPMDataset(Dataset):
             print("Caching high-fidelity 512x512 projections to RAM. This will take ~2 minutes on first run due to skimage.radon...")
             # For 2168 arrays, this is around 2-3GB memory footprint which is easily handled.
             for i in range(len(self.files)):
-                self._load_and_simulate(i)
+                self.ram_cache[i] = self._load_and_simulate(i)
 
     def _load_and_simulate(self, idx):
         file_path = self.files[idx]
