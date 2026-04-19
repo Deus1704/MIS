@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from skimage.transform import iradon
 
 # Hook into existing repo metrics
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from ct_recon_dl.ct_recon.metrics import compute_metrics
 from dataset_aapm import AAPMDataset
 from lpd_model import LearnedPrimalDual
@@ -24,7 +24,7 @@ def evaluate_aapm_metrics():
     # Validation constraints
     image_size = 512
     num_angles = 180
-    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'real_data', 'aapm_ldct'))
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'real_data', 'aapm_ldct'))
     
     # DataLoader pointing explicitly to Phantom_Eval split
     eval_dataset = AAPMDataset(root_dir=root_dir, split="eval", n_angles=num_angles, image_size=image_size, cache_to_ram=True)

@@ -26,7 +26,7 @@ def main():
     print(f"Using device: {device}")
     
     # Path to real data
-    data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'real_data', 'organamnist', 'raw', 'organamnist.npz'))
+    data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'real_data', 'organamnist', 'raw', 'organamnist.npz'))
     if not os.path.exists(data_path):
         raise FileNotFoundError(f"Real data not found at {data_path}")
 

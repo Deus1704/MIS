@@ -25,7 +25,7 @@ function draw_progress_bar() {
     printf "["
     for ((i=0; i<=BAR_WIDTH; i++)); do
         printf "█"
-        sleep $(bc -l <<< "$DURATION / $BAR_WIDTH")
+        sleep $(awk "BEGIN {print $DURATION / $BAR_WIDTH}")
     done
     printf "] 100%%\n"
 }

@@ -22,7 +22,7 @@ def train_aapm():
     # instead of hardcoding 724 if the array changes based on circle=False
     
     # Pathing
-    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'real_data', 'aapm_ldct'))
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'real_data', 'aapm_ldct'))
     if not os.path.exists(root_dir):
         print(f"WARNING: AAPM Data path {root_dir} not found. Did you run download_aapm.py?")
         return
