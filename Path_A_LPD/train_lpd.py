@@ -15,7 +15,7 @@ from lpd_model import LearnedPrimalDual
 def main():
     # Hyperparameters
     num_iterations = 5   # LPD unrolled iterations
-    batch_size = 4
+    batch_size = 16
     learning_rate = 1e-4
     num_epochs = 10
     image_size = 128

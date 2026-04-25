@@ -1,0 +1,18 @@
+{
+  "dataset": "OrganAMNIST (real CT slices from LiTS)",
+  "data_path": "/teamspace/studios/this_studio/ct_recon_dl/../real_data/organamnist/raw/organamnist.npz",
+  "n_train": 5000,
+  "n_val": 1250,
+  "n_test": 1000,
+  "image_size": 28,
+  "n_angles": 45,
+  "dose_fraction": 0.25,
+  "methods": [
+    "red_cnn",
+    "unet",
+    "attention_unet",
+    "freq_hybrid"
+  ],
+  "device": "cpu",
+  "epochs": 3
+}

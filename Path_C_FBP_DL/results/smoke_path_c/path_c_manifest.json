@@ -1,0 +1,22 @@
+{
+  "run_dir": "/teamspace/studios/this_studio/MIS_Project/Path_C_FBP_DL/results/smoke_path_c",
+  "copied_metrics": [
+    "training_curves.csv",
+    "inference_metrics.csv",
+    "method_summary.csv"
+  ],
+  "copied_visuals": [
+    "ct_panel.png",
+    "training_curves.png",
+    "metrics_comparison.png",
+    "speed_quality_plot.png",
+    "radar_chart.png",
+    "freq_spectrum.png"
+  ],
+  "derived_files": {
+    "train_val_accuracy_detailed": "/teamspace/studios/this_studio/MIS_Project/Path_C_FBP_DL/results/smoke_path_c/metrics/train_val_accuracy_detailed.csv",
+    "train_val_best_epoch_summary": "/teamspace/studios/this_studio/MIS_Project/Path_C_FBP_DL/results/smoke_path_c/metrics/train_val_best_epoch_summary.csv",
+    "test_accuracy_summary": "/teamspace/studios/this_studio/MIS_Project/Path_C_FBP_DL/results/smoke_path_c/metrics/test_accuracy_summary.csv"
+  },
+  "report": "/teamspace/studios/this_studio/MIS_Project/Path_C_FBP_DL/results/smoke_path_c/path_c_objective_report.md"
+}
